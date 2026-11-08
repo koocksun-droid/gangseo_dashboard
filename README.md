@@ -27,3 +27,15 @@ API 키는 `collector/config.json` 에 있습니다. 이 파일은 공유하거�
 `collector/assets/hs_listings.json` : 강서힐스테이트 평형별 매물 (날짜는 `extra.json` 의 `hsAsOf`)
 
 고친 뒤 `python collector/build.py` 만 다시 실행하면 됩니다.
+
+## 웹에 다시 올리기
+
+데이터를 새로 받고 `build.py` 를 실행한 뒤:
+
+```
+git add -A
+git commit -m "데이터 갱신"
+git push
+```
+
+1~2분 뒤 https://koocksun-droid.github.io/gangseo_dashboard/ 에 반영됩니다.
