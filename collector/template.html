@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>GO부동산 강서구 아파트 브리핑</title>
+<meta name="description" content="국토교통부 실거래가와 한국부동산원 가격동향으로 보는 서울 강서구 아파트 시장 · GO부동산">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+:root{--bg:#f6f4f3;--panel:#fff;--ink:#231f20;--muted:#6f6866;--line:#e4dfdd;--chip:#f0ecea;--red:#d7261e;--red-soft:#fbe9e8;--blue:#2f6db5;--amber:#c27a12;--green:#2f8a57;--gray:#8a8380;--up:#d7261e;--down:#2f6db5;--shadow:0 1px 2px rgba(35,31,32,.06),0 4px 14px rgba(35,31,32,.05);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171515;--panel:#211e1e;--ink:#f3eeec;--muted:#a8a09d;--line:#363130;--chip:#2c2827;--red:#ff5a4f;--red-soft:#3a1f1d;--blue:#6aa4e8;--amber:#e5a548;--green:#5cc489;--gray:#a8a09d;--up:#ff5a4f;--down:#6aa4e8;--shadow:none;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171515;--panel:#211e1e;--ink:#f3eeec;--muted:#a8a09d;--line:#363130;--chip:#2c2827;--red:#ff5a4f;--red-soft:#3a1f1d;--blue:#6aa4e8;--amber:#e5a548;--green:#5cc489;--gray:#a8a09d;--up:#ff5a4f;--down:#6aa4e8;--shadow:none;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 "Noto Sans KR",-apple-system,"Malgun Gothic",sans-serif;-webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px}
+/* header */
+.top{background:var(--panel);border-bottom:3px solid var(--red);position:sticky;top:0;z-index:1000}
+.top .wrap{display:flex;align-items:center;gap:14px;min-height:64px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo img{height:44px;width:auto}
+.logo b{display:block;font-size:17px;font-weight:900;line-height:1.2}
+.logo small{display:block;font-size:12px;color:var(--muted)}
+.top .sp{flex:1}
+.pill{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:500}
+.tel{background:var(--red);color:#fff;border:0;border-radius:999px;padding:8px 16px;font-weight:700;text-decoration:none;white-space:nowrap}
+/* hero */
+.hero{padding:34px 0 26px;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:center}
+.eyebrow{font-size:12px;letter-spacing:.12em;color:var(--red);font-weight:700;text-transform:uppercase}
+.hero h1{font-size:clamp(26px,3.6vw,40px);line-height:1.25;margin:8px 0 10px;font-weight:900;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;color:var(--red)}
+.hero p{color:var(--muted);margin:0;max-width:640px}
+.badge{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow)}
+.badge .k{font-size:12px;color:var(--muted)}
+.badge .v{font-size:30px;font-weight:900;color:var(--red);line-height:1.2;margin:4px 0}
+/* filter bar */
+.bar{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:14px 22px;align-items:flex-end;box-shadow:var(--shadow)}
+.field{display:flex;flex-direction:column;gap:5px}
+.field>label,.field>.lb{font-size:12px;color:var(--muted);font-weight:500}
+select,input[type=date],input[type=text],input:not([type]){font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 10px;min-height:36px}
+.seg{display:inline-flex;background:var(--chip);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:500;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--panel)}
+.range{display:flex;gap:6px;align-items:center}
+.note{background:#fff7e8;border:1px solid #f2dfb8;color:#6b4d16;border-radius:12px;padding:10px 14px;font-size:13px;margin-top:14px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .note{background:#2e2716;border-color:#4a3d1d;color:#e9d29a}}
+:root[data-theme="dark"] .note{background:#2e2716;border-color:#4a3d1d;color:#e9d29a}
+/* sections */
+section{margin-top:34px}
+.sh{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:12px}
+.sh h2{font-size:21px;font-weight:900;margin:0;letter-spacing:-.01em}
+.sh small{color:var(--muted);font-size:13px}
+.sh .sp{flex:1}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+.pad{padding:16px 18px}
+.src{color:var(--muted);font-size:12px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi{padding:14px 16px;border-left:4px solid var(--red)}
+.kpi:nth-child(n+5){border-left-color:var(--blue)}
+.kpi .k{font-size:13px;color:var(--muted)}
+.kpi .v{font-size:26px;font-weight:900;margin:2px 0;letter-spacing:-.01em}
+.kpi .v small{font-size:14px;font-weight:500;margin-left:2px}
+.kpi .d{font-size:12px;color:var(--muted)}
+.up{color:var(--up)}.dn{color:var(--down)}
+/* top10 */
+.tabsrow{display:flex;flex-wrap:wrap;gap:8px}
+.topgrid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:14px}
+.rank{list-style:none;margin:0;padding:6px}
+.rank li{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 10px;border-radius:12px;cursor:pointer}
+.rank li:hover,.rank li.on{background:var(--chip)}
+.rank .no{width:28px;height:28px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-weight:900;font-size:13px}
+.rank li:nth-child(-n+3) .no{background:var(--red);color:#fff}
+.rank .nm{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank .sub{font-size:12px;color:var(--muted)}
+.rank .val{text-align:right;font-weight:900}
+.rank .val small{display:block;font-weight:400;font-size:11px;color:var(--muted)}
+.map{height:100%;min-height:440px;border-radius:16px}
+.mk{width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--panel);border:2px solid #fff;display:grid;place-items:center;font-weight:900;font-size:12px;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.mk.r{background:#d7261e;color:#fff}
+.mk.sel{background:#d7261e;color:#fff;width:32px;height:32px;font-size:15px}
+.leaflet-container{font:inherit;background:var(--chip)}
+.leaflet-popup-content{margin:10px 12px;font-size:13px;line-height:1.5}
+/* recs */
+.recs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.rec{padding:14px 16px;cursor:pointer;text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:3px}
+.rec:hover,.rec.on{border-color:var(--red)}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 7px;margin-right:4px}
+.tag.t{background:var(--red-soft);color:var(--red)}.tag.j{background:#e6eefa;color:#2f6db5}.tag.w{background:#e8f4ec;color:#2f8a57}.tag.s{background:var(--chip);color:var(--muted)}
+.rec .p{font-size:22px;font-weight:900}
+.rec .n{font-weight:700}
+.rec .m{font-size:12px;color:var(--muted)}
+.rec.add{align-items:center;justify-content:center;color:var(--muted);border-style:dashed;min-height:140px;font-weight:700}
+.addform{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:14px 16px}
+.addform .full{grid-column:1/-1}
+.btn{background:var(--red);color:#fff;border:0;border-radius:10px;padding:8px 16px;font-weight:700}
+.btn.ghost{background:var(--chip);color:var(--ink)}
+/* detail */
+.dhead{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:flex-end;padding:18px 20px;border-bottom:1px solid var(--line)}
+.dhead .t{font-size:24px;font-weight:900;line-height:1.25}
+.dhead .a{color:var(--muted);font-size:13px}
+.dstats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line)}
+.dstats>div{background:var(--panel);padding:12px 16px}
+.dstats .k{font-size:12px;color:var(--muted)}
+.dstats .v{font-size:19px;font-weight:900}
+.dstats .s{font-size:12px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--chip);border-radius:999px;padding:4px 11px;font-size:12px;border:0}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--panel)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.cw{position:relative;height:260px}
+.cw.tall{height:320px}
+h3{font-size:15px;margin:0 0 2px;font-weight:700}
+.tbl{overflow:auto;max-height:420px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{position:sticky;top:0;background:var(--panel);color:var(--muted);font-weight:500;font-size:12px;z-index:1}
+td:first-child,th:first-child{text-align:left}
+tr.click{cursor:pointer}
+tr.click:hover{background:var(--chip)}
+tr.on{background:var(--red-soft)}
+tfoot td{font-weight:700;background:var(--chip)}
+/* location */
+.locgrid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:14px}
+.layers{display:flex;flex-wrap:wrap;gap:6px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.layers button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:4px 11px;font-size:12px;display:inline-flex;align-items:center;gap:6px}
+.layers button[aria-pressed=false]{opacity:.45}
+.layers i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.lmk{width:22px;height:22px;border-radius:50%;color:#fff;display:grid;place-items:center;font-size:11px;font-weight:900;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.plabel{background:rgba(255,255,255,.95);color:#231f20;border:1px solid #d9d3d1;border-radius:6px;padding:1px 5px;font-size:11px;white-space:nowrap;font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.loccards{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;align-content:start}
+.lc{padding:12px 14px}
+.lc h4{margin:0 0 6px;font-size:13px;display:flex;align-items:center;gap:6px}
+.lc h4 i{width:20px;height:20px;border-radius:50%;color:#fff;display:grid;place-items:center;font-size:11px;font-style:normal}
+.lc ul{list-style:none;margin:0;padding:0}
+.lc li{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:2px 0}
+.lc li span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lc li span:last-child{color:var(--muted);white-space:nowrap}
+.ln{display:inline-block;min-width:18px;padding:0 4px;height:18px;border-radius:9px;font-size:11px;font-weight:700;color:#fff;text-align:center;line-height:18px;margin-left:4px}
+.dev{grid-column:1/-1}
+.dev li{display:block;padding:6px 0;border-bottom:1px dashed var(--line)}
+.dev li:last-child{border:0}
+.dev b{font-size:13px}
+.dev .st{font-size:11px;border-radius:6px;padding:0 6px;background:var(--chip);margin-left:6px}
+.dev p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+#hsTbl th,#hsTbl td{text-align:left}
+.hs-sum{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.foot{margin:40px 0 30px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;display:flex;flex-direction:column;gap:6px}
+.foot b{color:var(--ink)}
+@media (max-width:1080px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.recs{grid-template-columns:repeat(2,minmax(0,1fr))}.dstats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){.topgrid,.two,.locgrid,.hero{grid-template-columns:minmax(0,1fr)}.bar{position:static}.map{min-height:360px}}
+@media (max-width:560px){.kpis,.recs,.loccards{grid-template-columns:minmax(0,1fr)}.dstats{grid-template-columns:repeat(2,minmax(0,1fr))}.addform{grid-template-columns:repeat(2,minmax(0,1fr))}.logo small{display:none}.pill{display:none}.top .wrap{gap:8px}}
+@media print{.top,.bar{position:static}.pill,.layers,.rec.add,.addbox{display:none}section{break-inside:avoid}body{background:#fff}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="#"><img src="__LOGO__" alt="GO부동산 로고"><span><b>GO부동산</b><small id="tagline"></small></span></a>
+  <span class="sp"></span>
+  <button class="pill" type="button" id="printBtn">인쇄·PDF</button>
+  <a class="tel num" id="tel" href="#"></a>
+</div></header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Gangseo-gu Apartment Briefing</div>
+      <h1>강서구 아파트 시장, <em>실거래 데이터</em>로 한눈에</h1>
+      <p>국토교통부 실거래가와 한국부동산원 가격동향을 바탕으로 동별 시세·Top10 단지·입지·주변 단지 비교를 정리했습니다.</p>
+    </div>
+    <div class="badge"><div class="k">강서구 아파트 전문</div><div class="v">GO부동산</div><div class="src">매매·전월세 상담은 전화로 편하게 문의하세요</div></div>
+  </div>
+
+  <div class="bar" id="bar">
+    <div class="field"><label for="dong">지역 (강서구 법정동)</label><select id="dong"></select></div>
+    <div class="field"><span class="lb">조회 기간</span><span class="seg" id="modeSeg">
+      <button type="button" data-v="week">주간</button><button type="button" data-v="month">월간</button><button type="button" data-v="3m">3개월</button><button type="button" data-v="6m">6개월</button><button type="button" data-v="1y">1년</button><button type="button" data-v="custom">직접 지정</button>
+    </span></div>
+    <div class="field"><span class="lb">기간</span><span class="range"><input type="date" id="d1" aria-label="시작일"><span>~</span><input type="date" id="d2" aria-label="종료일"></span></div>
+    <div class="field"><span class="lb">추이 차트 단위</span><span class="seg" id="unitSeg"><button type="button" data-v="week">주간</button><button type="button" data-v="month">월간</button></span></div>
+  </div>
+  <div class="note" id="dataNote"></div>
+
+  <section>
+    <div class="sh"><h2>시장 요약</h2><small id="kpiLabel"></small></div>
+    <div class="kpis" id="kpis"></div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>아파트 Top 10</h2><small id="topLabel"></small><span class="sp"></span>
+      <div class="tabsrow"><span class="seg" id="kindSeg"><button type="button" data-v="t">매매</button><button type="button" data-v="j">전세</button><button type="button" data-v="w">월세</button></span>
+      <span class="seg" id="sortSeg"><button type="button" data-v="ppy">평당가</button><button type="button" data-v="max">최고가</button><button type="button" data-v="cnt">거래량</button></span></div>
+    </div>
+    <div class="topgrid">
+      <div class="card"><ol class="rank" id="rank"></ol><div class="src pad" id="rankNote" style="padding-top:0"></div></div>
+      <div class="card"><div class="map" id="topMap" role="region" aria-label="Top 10 단지 위치 지도"></div></div>
+    </div>
+    <div class="src" style="margin-top:6px">번호를 누르면 단지 정보와 최근 실거래가가 표시되고, 아래에 단지·입지 분석이 열립니다.</div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>GO부동산 추천 매물</h2><small>카드를 누르면 단지·입지 분석이 열립니다</small></div>
+    <div class="recs" id="recs"></div>
+    <details class="card addbox" id="addbox" style="margin-top:12px"><summary class="pad" style="cursor:pointer;font-weight:700">＋ 추천 매물 추가하기</summary>
+      <form class="addform" id="addform">
+        <select id="f-apt" class="full" aria-label="단지"></select>
+        <select id="f-type" aria-label="거래 유형"><option value="t">매매</option><option value="j">전세</option><option value="w">월세</option></select>
+        <input id="f-price" placeholder="가격 (예: 15억 7,000)" aria-label="가격">
+        <input id="f-area" placeholder="면적 (예: 84㎡ (34평형))" aria-label="면적">
+        <input id="f-floor" placeholder="층 (예: 중층)" aria-label="층">
+        <input id="f-memo" class="full" placeholder="한줄 메모 (예: 남향, 올수리)" aria-label="메모">
+        <div class="full" style="display:flex;gap:10px;align-items:center"><button class="btn" type="submit">매물 추가</button><span class="src">이 브라우저에만 저장됩니다.</span></div>
+      </form>
+    </details>
+  </section>
+
+  <section id="detail">
+    <div class="card">
+      <div class="dhead">
+        <div><div class="a" id="dAddr"></div><div class="t" id="dName"></div></div>
+        <span style="flex:1"></span>
+        <div class="chips" id="pyChips" role="group" aria-label="평형 선택"></div>
+      </div>
+      <div class="dstats" id="dStats"></div>
+      <div class="pad" style="border-top:1px solid var(--line)"><div class="src" style="margin-bottom:6px">평형 구성 (실거래 전용면적 · 공급평형 근사 · 거래건수)</div><div class="chips" id="dMix"></div></div>
+    </div>
+    <div class="two" style="margin-top:14px">
+      <div class="card pad"><h3>단지 시세 시계열</h3><div class="src">월별 3.3㎡당 매매 중위가 · 이 단지 vs 반경 1km 주변 단지 vs 강서구 (막대: 이 단지 거래량)</div><div class="cw tall"><canvas id="cDetail"></canvas></div></div>
+      <div class="card pad"><div style="display:flex;align-items:center;gap:10px"><h3>최근 실거래 내역</h3><span class="sp" style="flex:1"></span><span class="seg" id="dealSeg"><button type="button" data-v="t">매매</button><button type="button" data-v="r">전월세</button></span></div>
+        <div class="tbl" style="max-height:330px;margin-top:8px"><table id="dealTbl"></table></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>입지 분석</h2><small>원은 반경 500m / 1km, 숫자 라벨은 주변 단지의 최근 1년 매매 3.3㎡당 중위가(만원)</small></div>
+    <div class="locgrid">
+      <div class="card" style="display:flex;flex-direction:column"><div class="layers" id="layers"></div><div class="map" id="locMap" style="flex:1;border-radius:0 0 16px 16px" role="region" aria-label="입지 분석 지도"></div></div>
+      <div class="loccards" id="locCards"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>주변 단지 시세 비교</h2><small>반경 1km · 최근 1년 실거래 · 행을 누르면 해당 단지로 이동</small></div>
+    <div class="card"><div class="tbl" style="max-height:460px"><table id="nearTbl"></table></div></div>
+    <div class="card pad" style="margin-top:14px"><h3>주변 단지 3.3㎡당 매매가 비교</h3><div class="src">빨간 막대가 선택한 단지입니다.</div><div class="cw tall"><canvas id="cNear"></canvas></div></div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>시장 지표</h2><small id="mktLabel"></small></div>
+    <div class="two">
+      <div class="card pad"><h3 id="hIdxS">아파트 매매가격지수</h3><div class="src">한국부동산원 · 강서구 vs 서울 vs 전국</div><div class="cw"><canvas id="cIdxS"></canvas></div></div>
+      <div class="card pad"><h3 id="hIdxJ">아파트 전세가격지수</h3><div class="src">한국부동산원 · 강서구 vs 서울 vs 전국</div><div class="cw"><canvas id="cIdxJ"></canvas></div></div>
+      <div class="card pad"><h3 id="hChg">강서구 지수 변동률</h3><div class="src">한국부동산원 · 직전 대비 %</div><div class="cw"><canvas id="cChg"></canvas></div></div>
+      <div class="card pad"><h3 id="hVol">거래량</h3><div class="src">국토교통부 실거래 신고 기준 · 매매 / 전세 / 월세</div><div class="cw"><canvas id="cVol"></canvas></div></div>
+      <div class="card pad"><h3 id="hPpy">3.3㎡당 실거래가</h3><div class="src">중위값 · 매매 vs 전세</div><div class="cw"><canvas id="cPpy"></canvas></div></div>
+      <div class="card pad"><h3>월세가격지수 (월간)</h3><div class="src">한국부동산원 · 강서구 vs 서울</div><div class="cw"><canvas id="cRent"></canvas></div></div>
+      <div class="card pad"><h3>전세가율 (월간)</h3><div class="src">한국부동산원 · 중위 매매가격 대비 전세가격 %</div><div class="cw"><canvas id="cRatio"></canvas></div></div>
+      <div class="card pad"><h3>매매수급동향 (월간)</h3><div class="src">한국부동산원 · 100 초과 = 매수자 우위 · 구 단위 미발표로 서남권 표시</div><div class="cw"><canvas id="cSupply"></canvas></div></div>
+      <div class="card pad"><h3>전용면적대별 매매 비중</h3><div class="src" id="areaLabel"></div><div class="cw"><canvas id="cArea"></canvas></div></div>
+      <div class="card pad"><h3>동별 거래량 비교</h3><div class="src" id="dongBarLabel">조회 기간 합계</div><div class="cw"><canvas id="cDong"></canvas></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>동별 거래 현황</h2><small id="dongLabel"></small></div>
+    <div class="card"><div class="tbl" style="max-height:none"><table id="dongTbl"></table></div></div>
+    <div class="src" style="margin-top:6px">▲▼는 직전 같은 길이 기간 대비 변화입니다. 동 이름을 누르면 해당 동으로 전환됩니다.</div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>강서힐스테이트 평형별 매물</h2><small id="hsLabel"></small></div>
+    <div class="hs-sum" id="hsSum"></div>
+    <div class="card"><div class="tbl" style="max-height:380px"><table id="hsTbl"></table></div></div>
+  </section>
+
+  <footer class="foot" id="foot"></footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+/*__DATA__*/
+</script>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const el=(t,a={},...c)=>{const e=document.createElement(t);for(const k in a){if(k==='class')e.className=a[k];else if(k==='text')e.textContent=a[k];else if(k.startsWith('on'))e.addEventListener(k.slice(2),a[k]);else e.setAttribute(k,a[k])}c.forEach(x=>x!=null&&e.append(x));return e};
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- 숫자 표기 ---------- */
+const PYC=3.3058;
+const fmt=n=>Math.round(n).toLocaleString('ko-KR');
+const won=m=>{m=Math.round(m);if(!m)return '-';const e=Math.floor(m/10000),r=m%10000;return e?(e+'억'+(r?' '+r.toLocaleString('ko-KR'):'')):r.toLocaleString('ko-KR')+'만'};
+const eok=m=>(m/10000).toFixed(1).replace(/\.0$/,'')+'억';
+const med=a=>{if(!a.length)return 0;const s=a.slice().sort((x,y)=>x-y),h=s.length>>1;return s.length%2?s[h]:(s[h-1]+s[h])/2};
+const pct=(a,b)=>b?((a-b)/b*100):null;
+const chg=(v,unit)=>{if(v==null||!isFinite(v))return el('span',{text:'비교 불가'});const c=v>0.05?'up':v<-0.05?'dn':'';return el('span',{class:c,text:(v>0.05?'▲ ':v<-0.05?'▼ ':'- ')+Math.abs(v).toFixed(1)+(unit||'%')})};
+// 전용→공급 비율은 면적이 클수록 작아진다 (강서힐스테이트 84.99㎡=33평, 128.81㎡=48평 기준으로 맞춤)
+const pyOf=a=>Math.round(a*(a<50?1.4:a<70?1.32:a<90?1.28:a<110?1.25:a<140?1.23:1.2)/PYC);
+const hav=(a1,o1,a2,o2)=>{const R=6371000,t=Math.PI/180,dA=(a2-a1)*t,dO=(o2-o1)*t;const x=Math.sin(dA/2)**2+Math.cos(a1*t)*Math.cos(a2*t)*Math.sin(dO/2)**2;return 2*R*Math.asin(Math.sqrt(x))};
+const fmtD=m=>m<1000?Math.round(m/10)*10+'m':(m/1000).toFixed(1)+'km';
+const walk=m=>Math.max(1,Math.round(m*1.25/80))+'분';
+
+/* ---------- 날짜 ---------- */
+const DAY=864e5;
+const toT=s=>Date.parse(s+'T00:00:00Z');
+const iso=t=>new Date(t).toISOString().slice(0,10);
+const ym=s=>s.slice(0,7);
+const LAST=[D.trades.at(-1)[1],D.rents.at(-1)[1]].sort().at(-1);
+const FIRST=[D.trades[0][1],D.rents[0][1]].sort()[0];
+
+/* ---------- 데이터 준비 ---------- */
+const APTS=D.apts.map((a,i)=>({...a,id:i,t:[],r:[]}));
+D.trades.forEach(x=>APTS[x[0]].t.push(x));
+D.rents.forEach(x=>APTS[x[0]].r.push(x));
+APTS.forEach(a=>{a.n=a.t.length+a.r.length});
+const DONGS=[...new Set(APTS.map(a=>a.dong))].sort((x,y)=>APTS.filter(a=>a.dong===y).reduce((s,a)=>s+a.n,0)-APTS.filter(a=>a.dong===x).reduce((s,a)=>s+a.n,0));
+const isJ=r=>r[5]===0;
+const ppy=(amt,area)=>amt/area*PYC;
+const ex=D.extra;
+
+/* ---------- 상태 ---------- */
+const saved=store.get('go-gs2-ui',{});
+const S={dong:saved.dong&&DONGS.includes(saved.dong)?saved.dong:'전체',mode:saved.mode||'3m',unit:saved.unit||'month',kind:'t',sort:'ppy',sel:null,py:'all',deal:'t',d1:null,d2:null,layers:store.get('go-gs2-layers',null)};
+const saveUI=()=>store.set('go-gs2-ui',{dong:S.dong,mode:S.mode,unit:S.unit});
+
+function period(){
+  let d2=toT(LAST),d1;
+  const back={week:6,month:29,'3m':89,'6m':181,'1y':364}[S.mode];
+  if(S.mode==='custom'){d1=toT($('#d1').value||iso(d2-89*DAY));d2=toT($('#d2').value||LAST);if(d1>d2)[d1,d2]=[d2,d1]}
+  else d1=d2-back*DAY;
+  const len=d2-d1;
+  return {a:iso(d1),b:iso(d2),pa:iso(d1-len-DAY),pb:iso(d1-DAY)};
+}
+const inR=(d,a,b)=>d>=a&&d<=b;
+const dongOk=id=>S.dong==='전체'||APTS[id].dong===S.dong;
+function slice(p,prev){const a=prev?p.pa:p.a,b=prev?p.pb:p.b;
+  const t=D.trades.filter(x=>inR(x[1],a,b)&&dongOk(x[0]));
+  const r=D.rents.filter(x=>inR(x[1],a,b)&&dongOk(x[0]));
+  return {t,j:r.filter(isJ),w:r.filter(x=>!isJ(x))}}
+
+/* ---------- 차트 공통 ---------- */
+const CH={};
+function chart(id,cfg){if(CH[id])CH[id].destroy();
+  Chart.defaults.font.family='"Noto Sans KR","Malgun Gothic",sans-serif';Chart.defaults.color=css('--muted');Chart.defaults.borderColor=css('--line');
+  cfg.options=Object.assign({responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'top',align:'start',labels:{boxWidth:10,boxHeight:10,usePointStyle:true}}}},cfg.options||{});
+  CH[id]=new Chart(document.getElementById(id),cfg)}
+const COL=()=>({g:css('--red'),s:css('--blue'),n:css('--gray'),w:css('--amber'),gr:css('--green')});
+const line=(label,data,color,extra)=>Object.assign({label,data,borderColor:color,backgroundColor:color,borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.25,spanGaps:true},extra||{});
+
+/* ---------- 헤더 ---------- */
+$('#tagline').textContent=ex.office.tagline;
+$('#tel').textContent='Tel. '+ex.office.tel;$('#tel').href='tel:'+ex.office.tel.replace(/-/g,'');
+$('#printBtn').onclick=()=>window.print();
+
+/* ---------- 필터 ---------- */
+const dongSel=$('#dong');
+dongSel.append(el('option',{value:'전체',text:'강서구 전체'}),...DONGS.map(d=>el('option',{value:d,text:d})));
+dongSel.value=S.dong;dongSel.onchange=()=>{S.dong=dongSel.value;saveUI();render()};
+function segBind(id,key,cb){const seg=$(id);const upd=()=>seg.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===S[key])));
+  seg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S[key]=b.dataset.v;upd();cb()});upd();return upd}
+const updMode=segBind('#modeSeg','mode',()=>{saveUI();render()});
+segBind('#unitSeg','unit',()=>{saveUI();renderMarket(period())});
+segBind('#kindSeg','kind',()=>renderTop(period()));
+segBind('#sortSeg','sort',()=>renderTop(period()));
+segBind('#dealSeg','deal',()=>renderDeals());
+['#d1','#d2'].forEach(s=>{const i=$(s);i.min=FIRST;i.max=LAST;i.onchange=()=>{S.mode='custom';updMode();render()}});
+
+/* ---------- 시장 요약 ---------- */
+function rLast(name,reg){const s=(D.rone[name]||{})[reg];return s&&s.length?s:null}
+function kpi(k,v,d){return el('div',{class:'card kpi'},el('div',{class:'k',text:k}),v,el('div',{class:'d num'},...d))}
+function renderKPI(p){
+  const c=slice(p),q=slice(p,true);const where=S.dong==='전체'?'강서구':S.dong;
+  $('#kpiLabel').textContent=`${where} · ${p.a} ~ ${p.b}`;
+  const tp=c.t.map(x=>ppy(x[4],x[2])),tq=q.t.map(x=>ppy(x[4],x[2]));
+  const jm=med(c.j.map(x=>x[4])),jq=med(q.j.map(x=>x[4]));
+  const wm=med(c.w.map(x=>x[5])),wq=med(q.w.map(x=>x[5])),wd=med(c.w.map(x=>x[4]));
+  const box=[];
+  box.push(kpi(`${where} 매매 거래량`,el('div',{class:'v num'},fmt(c.t.length),el('small',{text:'건'})),[chg(pct(c.t.length,q.t.length)),` 직전 동기간 ${fmt(q.t.length)}건`]));
+  box.push(kpi('매매 3.3㎡당 중위가',el('div',{class:'v num'},tp.length?fmt(med(tp)):'-',el('small',{text:'만원'})),[chg(pct(med(tp),med(tq))),' 직전 동기간 대비']));
+  box.push(kpi(`전세 보증금 중위 (${fmt(c.j.length)}건)`,el('div',{class:'v num',text:won(jm)}),[chg(pct(jm,jq)),' 직전 동기간 대비']));
+  box.push(kpi(`월세 중위 (${fmt(c.w.length)}건)`,el('div',{class:'v num'},wm?fmt(wm):'-',el('small',{text:'만원'})),[`보증금 중위 ${won(wd)} · `,chg(pct(wm,wq))]));
+  const idx=(name,label)=>{const s=rLast(name,'강서구');if(!s)return kpi(label,el('div',{class:'v',text:'-'}),['자료 없음']);
+    const [d,v]=s.at(-1),w=s.at(-2)[1],y=s[Math.max(0,s.length-53)][1];
+    return kpi(label,el('div',{class:'v num',text:v.toFixed(2)}),[chg(pct(v,w)),' 주간 · ',chg(pct(v,y)),' 1년 · '+d])};
+  box.push(idx('sale_w','강서구 매매가격지수 (주간)'));
+  box.push(idx('jeonse_w','강서구 전세가격지수 (주간)'));
+  const r=rLast('ratio_m','강서구');
+  box.push(r?kpi('강서구 전세가율 (월간)',el('div',{class:'v num'},r.at(-1)[1].toFixed(1),el('small',{text:'%'})),[`전월 ${r.at(-2)[1].toFixed(1)} · ${r.at(-1)[0].slice(0,4)}년 ${+r.at(-1)[0].slice(4)}월 · 중위 기준`]):kpi('전세가율',el('div',{class:'v',text:'-'}),['']));
+  const sp=rLast('supply_m','서남권')||rLast('supply_m','서울');const spn=rLast('supply_m','서남권')?'서남권':'서울';
+  box.push(sp?kpi(`${spn} 매매수급지수 (월간)`,el('div',{class:'v num',text:sp.at(-1)[1].toFixed(1)}),[`전월 ${sp.at(-2)[1].toFixed(1)} · ${sp.at(-1)[0].slice(0,4)}년 ${+sp.at(-1)[0].slice(4)}월 · 100↑ 매수우위`]):kpi('매매수급',el('div',{class:'v',text:'-'}),['']));
+  $('#kpis').replaceChildren(...box);
+}
+
+/* ---------- Top 10 ---------- */
+let TOP=[];
+function aggApt(rows,kind){const m=new Map();rows.forEach(x=>{let o=m.get(x[0]);if(!o){o={id:x[0],v:[],p:[],last:null};m.set(x[0],o)}
+  if(kind==='t'){o.v.push(ppy(x[4],x[2]));o.p.push(x[4])}else if(kind==='j'){o.v.push(ppy(x[4],x[2]));o.p.push(x[4])}else{o.v.push(x[5]);o.p.push(x[5])}
+  if(!o.last||x[1]>=o.last[1])o.last=x});return [...m.values()]}
+function renderTop(p){
+  const c=slice(p);const rows=c[S.kind];const ag=aggApt(rows,S.kind).map(o=>({...o,med:med(o.v),max:Math.max(...o.p),cnt:o.v.length}));
+  let list=S.sort==='cnt'?ag.sort((a,b)=>b.cnt-a.cnt||b.med-a.med):S.sort==='max'?ag.sort((a,b)=>b.max-a.max):ag.filter(o=>o.cnt>=2).sort((a,b)=>b.med-a.med);
+  TOP=list.slice(0,10);
+  const kn={t:'매매',j:'전세',w:'월세'}[S.kind];
+  $('#topLabel').textContent=`${S.dong==='전체'?'강서구':S.dong} · ${kn} · ${p.a} ~ ${p.b}`;
+  $('#rankNote').textContent=`${p.a} ~ ${p.b} 실거래 기준.`+(S.sort==='ppy'?' 거래 2건 이상 단지만 순위에 포함.':'')+(S.kind==='w'?' 월세는 월 임대료(만원) 기준.':'');
+  const ol=$('#rank');ol.replaceChildren();
+  if(!TOP.length)ol.append(el('li',{style:'cursor:default'},el('span'),el('span',{class:'sub',text:'해당 기간 거래가 없습니다.'}),el('span')));
+  TOP.forEach((o,i)=>{const a=APTS[o.id];
+    let val,sub;
+    if(S.sort==='max'){val=S.kind==='w'?fmt(o.max)+'만':won(o.max);sub=`최고가 · ${o.cnt}건`}
+    else if(S.sort==='cnt'){val=o.cnt+'건';sub=S.kind==='w'?`월세 중위 ${fmt(o.med)}만`:`3.3㎡당 ${fmt(o.med)}만`}
+    else{val=fmt(o.med)+'만';sub=(S.kind==='w'?'월세 중위':'3.3㎡당')+` · ${o.cnt}건`}
+    const li=el('li',{class:a.id===S.sel?'on':'',onclick:()=>select(a.id,true)},el('span',{class:'no',text:i+1}),
+      el('div',{},el('div',{class:'nm',text:a.name}),el('div',{class:'sub',text:`${a.dong}`+(a.built?` · ${a.built}년`:'')})),
+      el('div',{class:'val num'},val,el('small',{text:sub})));
+    ol.append(li)});
+  renderTopMap();
+}
+let topMap,topLayer;
+function baseMap(id,center,zoom){const m=L.map(id,{scrollWheelZoom:false,zoomControl:true}).setView(center,zoom);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(m);return m}
+function popupHtml(a){const lt=a.t.at(-1);const d=el('div',{},el('b',{text:a.name}),el('div',{text:`${a.dong}`+(a.built?` · ${a.built}년 준공`:'')}));
+  if(lt)d.append(el('div',{text:`최근 매매 ${won(lt[4])} (${lt[1]} · ${lt[2]}㎡ · ${lt[3]}층)`}));
+  d.append(el('a',{href:'#detail',text:'단지·입지 분석 보기 →',onclick:e=>{e.preventDefault();select(a.id,true)}}));return d}
+function renderTopMap(){
+  if(!topMap){topMap=baseMap('topMap',[37.558,126.835],13);topLayer=L.layerGroup().addTo(topMap)}
+  topLayer.clearLayers();const pts=[];
+  TOP.forEach((o,i)=>{const a=APTS[o.id];if(a.lat==null)return;pts.push([a.lat,a.lon]);
+    L.marker([a.lat,a.lon],{icon:L.divIcon({className:'',html:`<div class="mk ${i<3?'r':''}">${i+1}</div>`,iconSize:[26,26],iconAnchor:[13,13]}),title:a.name,zIndexOffset:100-i}).bindPopup(()=>popupHtml(a)).addTo(topLayer)});
+  if(pts.length)topMap.fitBounds(pts,{padding:[30,30],maxZoom:15});
+}
+
+/* ---------- 추천 매물 ---------- */
+const findApt=m=>APTS.filter(a=>a.dong===m[0]&&a.name.replace(/\s/g,'').includes(m[1])).sort((x,y)=>y.n-x.n)[0];
+let RECS=[];
+function loadRecs(){const def=ex.recs.map(r=>{const a=findApt(r.m);return a?{...r,id:a.id,fixed:true}:null}).filter(Boolean);
+  const mine=store.get('go-gs2-recs',[]).filter(r=>APTS[r.id]);RECS=def.concat(mine)}
+function renderRecs(){const box=$('#recs');box.replaceChildren();
+  RECS.forEach((r,i)=>{const a=APTS[r.id];const kn={t:'매매',j:'전세',w:'월세'}[r.type];
+    const card=el('button',{type:'button',class:'rec'+(S.sel===a.id?' on':''),onclick:()=>select(a.id,true)},
+      el('div',{},el('span',{class:'tag '+r.type,text:kn}),r.sample?el('span',{class:'tag s',text:'샘플'}):null,r.own?el('span',{class:'tag s',text:'GO부동산 매물'}):null),
+      el('div',{class:'p num',text:r.price}),el('div',{class:'n',text:a.name}),
+      el('div',{class:'m',text:`${a.dong} · ${r.area}`+(r.floor&&r.floor!=='-'?` · ${r.floor}`:'')}),
+      el('div',{class:'m',text:a.built?`준공 ${a.built}년`:''}),el('div',{class:'m',text:r.memo||''}));
+    if(!r.fixed){const del=el('span',{class:'src',style:'margin-top:4px;text-decoration:underline',text:'삭제',onclick:e=>{e.stopPropagation();RECS.splice(i,1);store.set('go-gs2-recs',RECS.filter(x=>!x.fixed));renderRecs()}});card.append(del)}
+    box.append(card)});
+  box.append(el('button',{type:'button',class:'rec add',onclick:()=>{const d=$('#addbox');d.open=true;d.scrollIntoView({behavior:'smooth',block:'center'})}},'＋ 매물 추가'));
+}
+const fApt=$('#f-apt');
+APTS.filter(a=>a.t.length+a.r.length>=3).sort((x,y)=>x.dong.localeCompare(y.dong)||x.name.localeCompare(y.name)).forEach(a=>fApt.append(el('option',{value:a.id,text:`${a.dong} · ${a.name}`})));
+$('#addform').onsubmit=e=>{e.preventDefault();const r={id:+fApt.value,type:$('#f-type').value,price:$('#f-price').value.trim()||'가격 협의',area:$('#f-area').value.trim()||'-',floor:$('#f-floor').value.trim(),memo:$('#f-memo').value.trim()};
+  RECS.push(r);store.set('go-gs2-recs',RECS.filter(x=>!x.fixed));e.target.reset();renderRecs();select(r.id,false)};
+
+/* ---------- 단지 상세 ---------- */
+const yearAgo=()=>iso(toT(LAST)-365*DAY);
+function pyGroups(a){const m=new Map();[...a.t,...a.r].forEach(x=>{const py=pyOf(x[2]);const k=py;let o=m.get(k);if(!o){o={py,areas:[],n:0};m.set(k,o)}o.areas.push(x[2]);o.n++});return [...m.values()].sort((x,y)=>x.py-y.py)}
+const pyFilter=x=>S.py==='all'||pyOf(x[2])===+S.py;
+function select(id,scroll){S.sel=id;S.py='all';renderDetail();renderLoc();renderNear();renderTop(period());renderRecs();if(scroll)$('#detail').scrollIntoView({behavior:'smooth'})}
+function renderDetail(){
+  const a=APTS[S.sel];if(!a)return;
+  $('#dAddr').textContent=`서울 강서구 ${a.dong} ${a.jibun}`;$('#dName').textContent=a.name;
+  const groups=pyGroups(a);
+  $('#pyChips').replaceChildren(el('button',{type:'button',class:'chip','aria-pressed':String(S.py==='all'),onclick:()=>{S.py='all';renderDetail()}},'전체 평형'),
+    ...groups.map(g=>el('button',{type:'button',class:'chip','aria-pressed':String(S.py===String(g.py)),onclick:()=>{S.py=String(g.py);renderDetail()}},g.py+'평형')));
+  const t=a.t.filter(pyFilter),r=a.r.filter(pyFilter),y=yearAgo();
+  const t1=t.filter(x=>x[1]>=y),j1=r.filter(x=>isJ(x)&&x[1]>=y);
+  const lt=t.at(-1),lr=r.at(-1);
+  const st=(k,v,s)=>el('div',{},el('div',{class:'k',text:k}),el('div',{class:'v num',text:v}),el('div',{class:'s',text:s||''}));
+  $('#dStats').replaceChildren(
+    st('준공(실거래 기준)',a.built?a.built+'년':'-',a.built?`${new Date().getFullYear()-a.built+1}년차`:''),
+    st('최근 매매',lt?won(lt[4]):'-',lt?`${lt[1]} · ${lt[2]}㎡ · ${lt[3]}층`:'최근 매매 없음'),
+    st('1년 매매 3.3㎡당',t1.length?fmt(med(t1.map(x=>ppy(x[4],x[2]))))+'만':'-',`${t1.length}건`),
+    st('1년 전세 3.3㎡당',j1.length?fmt(med(j1.map(x=>ppy(x[4],x[2]))))+'만':'-',`${j1.length}건`),
+    st('최근 전월세',lr?(isJ(lr)?'전세 '+won(lr[4]):`${won(lr[4])} / ${fmt(lr[5])}만`):'-',lr?`${lr[1]} · ${lr[2]}㎡ · ${lr[3]}층`:''));
+  $('#dMix').replaceChildren(...groups.map(g=>el('span',{class:'chip num',text:`${Math.round(med(g.areas))}㎡ · ${g.py}평형 · ${g.n}건`})));
+  // 시계열: 최근 24개월
+  const months=[];{const e=new Date(toT(LAST));for(let i=23;i>=0;i--){const d=new Date(Date.UTC(e.getUTCFullYear(),e.getUTCMonth()-i,1));months.push(d.toISOString().slice(0,7))}}
+  const nearIds=new Set(nearby(a,1000).map(o=>o.a.id));
+  const byM=(rows)=>{const m={};rows.forEach(x=>{const k=ym(x[1]);(m[k]=m[k]||[]).push(ppy(x[4],x[2]))});return months.map(k=>m[k]?Math.round(med(m[k])):null)};
+  const cnt=months.map(k=>t.filter(x=>ym(x[1])===k).length);
+  const C=COL();
+  chart('cDetail',{data:{labels:months.map(m=>m.slice(2).replace('-','.')),datasets:[
+    line('이 단지',byM(t),C.g,{type:'line',pointRadius:3,yAxisID:'y'}),
+    line('반경 1km',byM(D.trades.filter(x=>nearIds.has(x[0])&&x[0]!==a.id&&pyFilter(x))),C.s,{type:'line',yAxisID:'y'}),
+    line('강서구',byM(D.trades.filter(pyFilter)),C.n,{type:'line',borderDash:[4,4],yAxisID:'y'}),
+    {type:'bar',label:'이 단지 거래량',data:cnt,backgroundColor:C.g+'33',borderWidth:0,yAxisID:'y2'}]},
+    options:{scales:{y:{ticks:{callback:v=>fmt(v)}},y2:{position:'right',grid:{display:false},beginAtZero:true,ticks:{precision:0}}}}});
+  renderDeals();
+}
+function renderDeals(){const a=APTS[S.sel];if(!a)return;const tb=$('#dealTbl');
+  if(S.deal==='t'){const rows=a.t.filter(pyFilter).slice().reverse().slice(0,60);
+    tb.replaceChildren(el('thead',{},el('tr',{},...['계약일','전용','층','거래가','3.3㎡당'].map(h=>el('th',{text:h})))),
+      el('tbody',{},...(rows.length?rows.map(x=>el('tr',{},el('td',{class:'num',text:x[1]}),el('td',{class:'num',text:x[2]+'㎡'}),el('td',{class:'num',text:x[3]}),el('td',{class:'num',text:won(x[4])}),el('td',{class:'num',text:fmt(ppy(x[4],x[2]))+'만'}))):[el('tr',{},el('td',{colspan:5,text:'매매 거래가 없습니다.'}))])))}
+  else{const rows=a.r.filter(pyFilter).slice().reverse().slice(0,80);
+    tb.replaceChildren(el('thead',{},el('tr',{},...['계약일','유형','전용','층','보증금','월세'].map(h=>el('th',{text:h})))),
+      el('tbody',{},...(rows.length?rows.map(x=>el('tr',{},el('td',{class:'num',text:x[1]}),el('td',{text:isJ(x)?'전세':'월세'}),el('td',{class:'num',text:x[2]+'㎡'}),el('td',{class:'num',text:x[3]}),el('td',{class:'num',text:won(x[4])}),el('td',{class:'num',text:x[5]?fmt(x[5])+'만':'-'}))):[el('tr',{},el('td',{colspan:6,text:'전월세 거래가 없습니다.'}))])))}
+}
+
+/* ---------- 주변 단지 ---------- */
+const REAL=b=>b.t.length>=3||b.r.length>=10;
+function nearby(a,r){if(a.lat==null)return [];return APTS.filter(b=>b.lat!=null&&(b.id===a.id||REAL(b))).map(b=>({a:b,d:hav(a.lat,a.lon,b.lat,b.lon)})).filter(o=>o.d<=r).sort((x,y)=>x.d-y.d)}
+function yearStats(b){const y=yearAgo();const t=b.t.filter(x=>x[1]>=y),j=b.r.filter(x=>isJ(x)&&x[1]>=y);
+  const tp=t.length?med(t.map(x=>ppy(x[4],x[2]))):0,jp=j.length?med(j.map(x=>ppy(x[4],x[2]))):0;
+  const t84=t.filter(x=>x[2]>=80&&x[2]<=86).map(x=>x[4]);
+  return {tn:t.length,tp,jp,jn:j.length,m84:t84.length?med(t84):0,ratio:tp&&jp?jp/tp*100:0,last:b.t.at(-1)}}
+function renderNear(){const a=APTS[S.sel];if(!a)return;const list=nearby(a,1000).slice(0,60);
+  const rows=list.map(o=>({...o,s:yearStats(o.a)}));
+  $('#nearTbl').replaceChildren(el('thead',{},el('tr',{},...['단지','거리','준공','매매 3.3㎡','84㎡ 중위','전세 3.3㎡','전세가율','최근 매매'].map(h=>el('th',{text:h})))),
+    el('tbody',{},...rows.map(o=>{const b=o.a,s=o.s;return el('tr',{class:'click'+(b.id===a.id?' on':''),onclick:()=>select(b.id,true)},
+      el('td',{},el('b',{text:b.name}),el('div',{class:'src',text:b.dong})),el('td',{class:'num',text:b.id===a.id?'선택':fmtD(o.d)}),el('td',{class:'num',text:b.built||'-'}),
+      el('td',{class:'num'},s.tp?fmt(s.tp)+'만':'-',el('div',{class:'src',text:s.tn+'건'})),el('td',{class:'num',text:s.m84?eok(s.m84):'-'}),
+      el('td',{class:'num',text:s.jp?fmt(s.jp)+'만':'-'}),el('td',{class:'num',text:s.ratio?Math.round(s.ratio)+'%':'-'}),
+      el('td',{class:'num'},s.last?won(s.last[4]):'-',el('div',{class:'src',text:s.last?s.last[1].slice(2):''})))})));
+  const bars=rows.filter(o=>o.s.tp&&o.s.tn>=2).sort((x,y)=>y.s.tp-x.s.tp).slice(0,25);const C=COL();
+  chart('cNear',{type:'bar',data:{labels:bars.map(o=>o.a.name.length>10?o.a.name.slice(0,10)+'…':o.a.name),datasets:[{label:'1년 매매 3.3㎡당 중위가(만원)',data:bars.map(o=>Math.round(o.s.tp)),backgroundColor:bars.map(o=>o.a.id===a.id?C.g:C.n+'99'),borderRadius:4}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>fmt(v)}},x:{ticks:{autoSkip:false,maxRotation:60,minRotation:45}}}}});
+}
+
+/* ---------- 입지 분석 ---------- */
+const LAY=[
+  ['st','지하철','#2f6db5','M'],['far','KTX·공항','#5b4ab5','K'],['e','초등학교','#2f8a57','초'],['m','중학교','#2f8a57','중'],['h','고등학교','#2f8a57','고'],
+  ['mt','대형마트','#c27a12','마'],['dp','백화점·몰','#b5428a','백'],['cf','브랜드 카페(1km)','#7a5230','C'],['po','관공서','#5b6770','관'],['hp','병원','#d7261e','병'],
+  ['pk','공원','#3f9a3a','P'],['dev','개발계획','#e0661b','개'],['apt','주변 단지 시세','#231f20','₩']];
+if(!S.layers)S.layers=Object.fromEntries(LAY.map(l=>[l[0],true]));
+const LCOL=Object.fromEntries(LAY.map(l=>[l[0],l[2]]));
+let locMap,locLayers={};
+const stBase=n=>n.replace(/\s.*$/,'').replace(/\(.*\)/,'');
+function poisNear(tag,a,r){return D.pois.filter(p=>p[0]===tag).map(p=>({p,d:hav(a.lat,a.lon,p[2],p[3])})).filter(o=>o.d<=r).sort((x,y)=>x.d-y.d)}
+function stations(a,r){const m=new Map();D.pois.filter(p=>p[0]==='st').forEach(p=>{const b=stBase(p[1]);const d=hav(a.lat,a.lon,p[2],p[3]);const o=m.get(b);if(!o||d<o.d)m.set(b,{name:b,d,p})});return [...m.values()].filter(o=>o.d<=r).sort((x,y)=>x.d-y.d)}
+function renderLayersBar(){$('#layers').replaceChildren(...LAY.map(l=>el('button',{type:'button','aria-pressed':String(!!S.layers[l[0]]),onclick:()=>{S.layers[l[0]]=!S.layers[l[0]];store.set('go-gs2-layers',S.layers);renderLayersBar();applyLayers()}},el('i',{style:`background:${l[2]}`}),l[1])))}
+function applyLayers(){for(const k in locLayers){if(S.layers[k])locLayers[k].addTo(locMap);else locLayers[k].remove()}}
+const lic=(c,t)=>L.divIcon({className:'',html:`<div class="lmk" style="background:${c}">${t}</div>`,iconSize:[22,22],iconAnchor:[11,11]});
+function renderLoc(){
+  const a=APTS[S.sel];if(!a||a.lat==null){$('#locCards').replaceChildren(el('div',{class:'card lc',text:'이 단지는 위치 정보를 찾지 못했습니다.'}));return}
+  if(!locMap){locMap=baseMap('locMap',[a.lat,a.lon],15);renderLayersBar()}
+  Object.values(locLayers).forEach(g=>g.remove());locLayers={};
+  const G=k=>(locLayers[k]=locLayers[k]||L.layerGroup());
+  const base=L.layerGroup().addTo(locMap);locLayers._base=base;S.layers._base=true;
+  L.circle([a.lat,a.lon],{radius:1000,color:'#d7261e',weight:1.5,fillOpacity:.03,dashArray:'6 6'}).addTo(base);
+  L.circle([a.lat,a.lon],{radius:500,color:'#d7261e',weight:1.5,fillOpacity:.05}).addTo(base);
+  L.marker([a.lat,a.lon],{icon:L.divIcon({className:'',html:'<div class="mk sel">★</div>',iconSize:[32,32],iconAnchor:[16,16]}),zIndexOffset:1000,title:a.name}).bindPopup(()=>popupHtml(a)).addTo(base);
+  const LAB=Object.fromEntries(LAY.map(l=>[l[0],l]));
+  const addP=(tag,p,label)=>L.marker([p[2],p[3]],{icon:lic(LAB[tag][2],LAB[tag][3]),title:p[1]}).bindTooltip(label||p[1]).addTo(G(tag));
+  stations(a,2500).forEach(o=>addP('st',o.p,o.name));
+  ex.far.forEach(f=>addP('far',[null,f[0],f[1],f[2]],`${f[0]} · ${f[3]}`));
+  ['e','m','h'].forEach(t=>poisNear(t,a,1500).slice(0,4).forEach(o=>addP(t,o.p)));
+  [['mt',3000,4],['dp',4000,4],['po',1500,6],['hp',3000,3],['pk',1200,6]].forEach(([t,r,n])=>poisNear(t,a,r).slice(0,n).forEach(o=>addP(t,o.p)));
+  poisNear('cf',a,1000).forEach(o=>addP('cf',o.p));
+  ex.dev.forEach(d=>L.marker([d.lat,d.lon],{icon:lic(LCOL.dev,'개'),title:d.n}).bindTooltip(`${d.n} (${d.st})`).addTo(G('dev')));
+  nearby(a,1000).filter(o=>o.a.id!==a.id).map(o=>({...o,s:yearStats(o.a)})).filter(o=>o.s.tn>=3).sort((x,y)=>y.s.tn-x.s.tn).slice(0,14).forEach(o=>{const s=o.s;
+    L.marker([o.a.lat,o.a.lon],{icon:L.divIcon({className:'',html:`<div class="plabel">${o.a.name.slice(0,8)} ${fmt(s.tp)}</div>`,iconSize:null,iconAnchor:[0,8]}),title:o.a.name}).on('click',()=>select(o.a.id,true)).addTo(G('apt'))});
+  applyLayers();locMap.setView([a.lat,a.lon],15);setTimeout(()=>locMap.invalidateSize(),50);
+  // 카드
+  const card=(tag,title,items,cls)=>el('div',{class:'card lc'+(cls?' '+cls:'')},el('h4',{},el('i',{style:`background:${LCOL[tag]}`,text:LAB[tag][3]}),title),el('ul',{},...items));
+  const li=(n,d,extra)=>el('li',{},el('span',{},n,extra||''),el('span',{class:'num',text:d}));
+  const sts=stations(a,3000).slice(0,4);
+  const LC={'2':'#00A84D','5':'#996CAC','9':'#BDB092','공항':'#0090D2','김포골드':'#A17E46','서해':'#8FC31F'};
+  const lineBadge=n=>{const v=ex.lines[n];return v?el('span',{},...v.split('·').map(x=>el('span',{class:'ln',style:`background:${LC[x]||'#5b6770'}`,text:x}))):null};
+  const far=ex.far.map(f=>({f,d:hav(a.lat,a.lon,f[1],f[2])})).sort((x,y)=>x.d-y.d);
+  const sch=t=>poisNear(t,a,2000).slice(0,2);
+  const malls=[...poisNear('mt',a,3000).slice(0,3),...poisNear('dp',a,4000).slice(0,2)].sort((x,y)=>x.d-y.d);
+  const cafes=poisNear('cf',a,1000),cafesAll=poisNear('cafe',a,500).length+poisNear('cf',a,500).length;
+  const dev=ex.dev.map(d=>({d,dist:hav(a.lat,a.lon,d.lat,d.lon)})).sort((x,y)=>x.dist-y.dist).slice(0,5);
+  $('#locCards').replaceChildren(
+    card('st','교통 · 지하철',sts.length?sts.map(o=>li(o.name.endsWith('역')?o.name:o.name+'역',`${fmtD(o.d)} · 도보 ${walk(o.d)}`,lineBadge(o.name))):[li('3km 내 지하철역 없음','')]),
+    card('far','교통 · KTX / 공항',far.map(o=>li(o.f[0],fmtD(o.d)))),
+    card('e','학군 · 초/중/고',[...sch('e'),...sch('m'),...sch('h')].map(o=>li(o.p[1],`${fmtD(o.d)} · 도보 ${walk(o.d)}`))),
+    card('mt','생활 · 상권',[...malls.map(o=>li(o.p[1],fmtD(o.d))),li('브랜드 카페',`1km 내 ${cafes.length}곳`+(cafes[0]?` · 최근접 ${cafes[0].p[1].split(' ')[0]} ${fmtD(cafes[0].d)}`:'')),li('카페(전체)',`500m 내 ${cafesAll}곳`)]),
+    card('po','관공서 · 의료',[...poisNear('po',a,2000).slice(0,4).map(o=>li(o.p[1],fmtD(o.d))),...poisNear('hp',a,3000).slice(0,2).map(o=>li(o.p[1],fmtD(o.d)))]),
+    card('pk','공원 · 녹지',poisNear('pk',a,2000).slice(0,4).map(o=>li(o.p[1],fmtD(o.d)))),
+    el('div',{class:'card lc dev'},el('h4',{},el('i',{style:`background:${LCOL.dev}`,text:'개'}),'주변 개발계획 ',el('span',{class:'src',text:'가까운 순 · 공개 계획 요약'})),
+      el('ul',{},...dev.map(o=>el('li',{},el('b',{text:o.d.n}),el('span',{class:'st',text:o.d.st}),el('span',{class:'src',text:' '+fmtD(o.dist)}),el('p',{text:o.d.s}))))));
+}
+
+/* ---------- 시장 지표 ---------- */
+function bucketKey(d){if(S.unit==='month')return ym(d);const t=toT(d);const wd=(new Date(t).getUTCDay()+6)%7;return iso(t-wd*DAY)}
+function buckets(){const out=[];if(S.unit==='month'){const s=new Date(toT(LAST));for(let i=23;i>=0;i--)out.push(new Date(Date.UTC(s.getUTCFullYear(),s.getUTCMonth()-i,1)).toISOString().slice(0,7))}
+  else{const last=toT(bucketKey(LAST));for(let i=51;i>=0;i--)out.push(iso(last-i*7*DAY))}return out}
+const lbl=k=>S.unit==='month'?k.slice(2).replace('-','.'):k.slice(5).replace('-','.');
+function idxSeries(name,reg,keys){const s=(D.rone[name]||{})[reg]||[];const m=new Map(s.map(([k,v])=>[S.unit==='month'&&k.length===6?k.slice(0,4)+'-'+k.slice(4):k,v]));return keys.map(k=>m.has(k)?m.get(k):null)}
+function renderMarket(p){
+  const C=COL();const where=S.dong==='전체'?'강서구':S.dong;
+  $('#mktLabel').textContent=`${S.unit==='month'?'월간':'주간'} 단위 · ${where} 실거래 + 한국부동산원`;
+  // 지수: 주간이면 주간표, 월간이면 월간표
+  let keys,sN,jN;
+  if(S.unit==='week'){sN='sale_w';jN='jeonse_w';keys=(D.rone.sale_w['강서구']||[]).slice(-52).map(x=>x[0])}
+  else{sN='sale_m';jN='jeonse_m';keys=(D.rone.sale_m['강서구']||[]).slice(-24).map(x=>x[0].slice(0,4)+'-'+x[0].slice(4))}
+  const u=S.unit==='month'?'월간':'주간';
+  $('#hIdxS').textContent=`아파트 매매가격지수 (${u})`;$('#hIdxJ').textContent=`아파트 전세가격지수 (${u})`;$('#hChg').textContent=`강서구 지수 변동률 (${u})`;
+  const L3=n=>[line('강서구',idxSeries(n,'강서구',keys),C.g),line('서울',idxSeries(n,'서울',keys),C.s),line('전국',idxSeries(n,'전국',keys),C.n,{borderDash:[4,4]})];
+  chart('cIdxS',{type:'line',data:{labels:keys.map(lbl),datasets:L3(sN)}});
+  chart('cIdxJ',{type:'line',data:{labels:keys.map(lbl),datasets:L3(jN)}});
+  const ch=n=>{const v=idxSeries(n,'강서구',keys);return v.map((x,i)=>i&&x!=null&&v[i-1]!=null?+((x/v[i-1]-1)*100).toFixed(3):null)};
+  chart('cChg',{type:'bar',data:{labels:keys.map(lbl),datasets:[{label:'매매',data:ch(sN),backgroundColor:C.g},{label:'전세',data:ch(jN),backgroundColor:C.s}]},options:{scales:{y:{ticks:{callback:v=>v+'%'}}}}});
+  // 실거래 기반
+  const bk=buckets();const T=D.trades.filter(x=>dongOk(x[0])),R=D.rents.filter(x=>dongOk(x[0]));
+  const cnt=(rows)=>{const m={};rows.forEach(x=>{const k=bucketKey(x[1]);m[k]=(m[k]||0)+1});return bk.map(k=>m[k]||0)};
+  $('#hVol').textContent=`${where} 거래량 (${u})`;$('#hPpy').textContent=`${where} 3.3㎡당 실거래가 (${u})`;
+  chart('cVol',{type:'bar',data:{labels:bk.map(lbl),datasets:[{label:'매매',data:cnt(T),backgroundColor:C.g},{label:'전세',data:cnt(R.filter(isJ)),backgroundColor:C.s},{label:'월세',data:cnt(R.filter(x=>!isJ(x))),backgroundColor:C.w}]},options:{scales:{x:{stacked:true},y:{stacked:true}}}});
+  const medB=rows=>{const m={};rows.forEach(x=>{const k=bucketKey(x[1]);(m[k]=m[k]||[]).push(ppy(x[4],x[2]))});return bk.map(k=>m[k]?Math.round(med(m[k])):null)};
+  chart('cPpy',{type:'line',data:{labels:bk.map(lbl),datasets:[line('매매',medB(T),C.g,{pointRadius:2}),line('전세',medB(R.filter(isJ)),C.s,{pointRadius:2})]},options:{scales:{y:{ticks:{callback:v=>fmt(v)}}}}});
+  const mk=(D.rone.rent_m['강서구']||[]).slice(-24).map(x=>x[0]);const mv=(n,r)=>{const m=new Map((D.rone[n][r]||[]));return mk.map(k=>m.has(k)?m.get(k):null)};const ml=mk.map(k=>k.slice(2,4)+'.'+k.slice(4));
+  chart('cRent',{type:'line',data:{labels:ml,datasets:[line('강서구',mv('rent_m','강서구'),C.g),line('서울',mv('rent_m','서울'),C.s)]}});
+  chart('cRatio',{type:'line',data:{labels:ml,datasets:[line('강서구',mv('ratio_m','강서구'),C.g),line('서울',mv('ratio_m','서울'),C.s),line('전국',mv('ratio_m','전국'),C.n,{borderDash:[4,4]})]},options:{scales:{y:{ticks:{callback:v=>v+'%'}}}}});
+  const sr=D.rone.supply_m['서남권']?'서남권':'서울';
+  chart('cSupply',{type:'line',data:{labels:ml,datasets:[line(sr,mv('supply_m',sr),C.g),line('서울',mv('supply_m','서울'),C.s),line('기준 100',mk.map(()=>100),C.n,{borderDash:[2,4],borderWidth:1})]}});
+  // 면적 비중
+  const c=slice(p);const bins=[['40㎡ 이하',0,40],['40~60㎡',40,60],['60~85㎡',60,85],['85~102㎡',85,102],['102~135㎡',102,135],['135㎡ 초과',135,1e9]];
+  const bc=bins.map(b=>c.t.filter(x=>x[2]>b[1]&&x[2]<=b[2]).length);
+  $('#areaLabel').textContent=`${p.a} ~ ${p.b} · ${where} 매매 ${fmt(c.t.length)}건`;
+  chart('cArea',{type:'doughnut',data:{labels:bins.map(b=>b[0]),datasets:[{data:bc,backgroundColor:[C.n,C.w,C.g,C.s,C.gr,'#7a5230'],borderColor:css('--panel'),borderWidth:2}]},options:{interaction:{mode:'nearest'},plugins:{legend:{position:'right'},tooltip:{callbacks:{label:x=>`${x.label}: ${x.raw}건 (${c.t.length?Math.round(x.raw/c.t.length*100):0}%)`}}}}});
+}
+
+/* ---------- 동별 ---------- */
+function renderDong(p){
+  $('#dongLabel').textContent=`${p.a} ~ ${p.b}`;
+  const all=d=>{const f=x=>APTS[x[0]].dong===d;const t=D.trades.filter(x=>f(x)&&inR(x[1],p.a,p.b)),tq=D.trades.filter(x=>f(x)&&inR(x[1],p.pa,p.pb));
+    const r=D.rents.filter(x=>f(x)&&inR(x[1],p.a,p.b));const j=r.filter(isJ),w=r.filter(x=>!isJ(x));
+    return {d,t:t.length,tq:tq.length,tp:med(t.map(x=>ppy(x[4],x[2]))),tpq:med(tq.map(x=>ppy(x[4],x[2]))),j:j.length,jm:med(j.map(x=>x[4])),w:w.length,wm:med(w.map(x=>x[5]))}};
+  const rows=DONGS.map(all).map(o=>({...o,sum:o.t+o.j+o.w})).sort((a,b)=>b.sum-a.sum);
+  const c=slice({...p}),tot={t:0,j:0,w:0};rows.forEach(o=>{tot.t+=o.t;tot.j+=o.j;tot.w+=o.w});
+  const cell=(v,ch)=>el('td',{class:'num'},v,ch!=null?el('div',{class:'src'},chg(ch)):null);
+  const allT=D.trades.filter(x=>inR(x[1],p.a,p.b)),allR=D.rents.filter(x=>inR(x[1],p.a,p.b));
+  $('#dongTbl').replaceChildren(el('thead',{},el('tr',{},...['법정동','매매','매매 3.3㎡','전세','전세 중위','월세','월세 중위','합계'].map(h=>el('th',{text:h})))),
+    el('tbody',{},...rows.map(o=>el('tr',{class:'click'+(S.dong===o.d?' on':''),onclick:()=>{S.dong=o.d;dongSel.value=o.d;saveUI();render()}},
+      el('td',{},el('b',{text:o.d})),cell(fmt(o.t),o.tq?pct(o.t,o.tq):null),cell(o.tp?fmt(o.tp)+'만':'-',o.tpq&&o.tp?pct(o.tp,o.tpq):null),
+      cell(fmt(o.j)),cell(o.jm?won(o.jm):'-'),cell(fmt(o.w)),cell(o.wm?fmt(o.wm)+'만':'-'),cell(fmt(o.sum))))),
+    el('tfoot',{},el('tr',{},el('td',{text:'강서구 전체'}),el('td',{class:'num',text:fmt(allT.length)}),el('td',{class:'num',text:allT.length?fmt(med(allT.map(x=>ppy(x[4],x[2]))))+'만':'-'}),
+      el('td',{class:'num',text:fmt(allR.filter(isJ).length)}),el('td',{class:'num',text:won(med(allR.filter(isJ).map(x=>x[4])))}),el('td',{class:'num',text:fmt(allR.filter(x=>!isJ(x)).length)}),
+      el('td',{class:'num',text:fmt(med(allR.filter(x=>!isJ(x)).map(x=>x[5])))+'만'}),el('td',{class:'num',text:fmt(allT.length+allR.length)}))));
+  const C=COL();
+  chart('cDong',{type:'bar',data:{labels:rows.map(o=>o.d),datasets:[{label:'매매',data:rows.map(o=>o.t),backgroundColor:C.g},{label:'전세',data:rows.map(o=>o.j),backgroundColor:C.s},{label:'월세',data:rows.map(o=>o.w),backgroundColor:C.w}]},options:{indexAxis:'y',scales:{x:{stacked:true},y:{stacked:true}}}});
+}
+
+/* ---------- 강서힐스테이트 매물 ---------- */
+const PYS=[['24평형','59.99'],['33평형','84.99'],['45평형','119.63'],['48평형','128.81'],['55평형','152.1']];
+function renderHS(){
+  $('#hsLabel').textContent=`GO부동산 등록 매물 · ${ex.hsAsOf} 기준`;
+  const rows=D.hs.map(([id,type,cat,price,area,dong,title])=>({id,type,cat,price,area,dong,title,py:cat==='아파트'?((PYS.find(p=>p[1]===area)||['기타'])[0]):'단지 내 상가'}));
+  const groups=[...PYS.map(p=>p[0]),'단지 내 상가'].map(g=>({g,n:rows.filter(r=>r.py===g).length})).filter(x=>x.n);
+  $('#hsSum').replaceChildren(...groups.map(x=>el('span',{class:'chip',text:`${x.g} ${x.n}건`})));
+  $('#hsTbl').replaceChildren(el('thead',{},el('tr',{},...['매물번호','유형','평형','가격','동','설명'].map(h=>el('th',{text:h})))),
+    el('tbody',{},...rows.map(r=>el('tr',{},el('td',{class:'num',text:r.id}),el('td',{},el('span',{class:'tag '+({매매:'t',전세:'j',월세:'w'}[r.type]||'s'),text:r.type})),el('td',{text:r.py}),el('td',{class:'num',style:'text-align:left',text:r.price}),el('td',{text:r.dong||'-'}),el('td',{style:'text-align:left;white-space:normal;min-width:260px',text:r.title})))));
+}
+
+/* ---------- 데이터 안내 ---------- */
+function renderNotes(){
+  $('#dataNote').replaceChildren(el('b',{text:'데이터 기준 '}),`실거래 ${FIRST} ~ ${LAST} (최근 계약일) · 수집 ${D.collected}. 실거래는 계약 후 30일 이내 신고되므로 최근 기간 수치는 추가 신고로 늘어날 수 있습니다. 해제(취소) 신고된 매매는 제외했습니다.`);
+  $('#foot').replaceChildren(
+    el('div',{},el('b',{text:`${ex.office.name}`}),` · ${ex.office.tagline} · 대표전화 ${ex.office.tel}`),
+    el('div',{text:'데이터: 국토교통부 아파트 매매·전월세 실거래가(공공데이터포털), 한국부동산원 R-ONE 부동산통계, 카카오 로컬(주변 시설), 지도 © OpenStreetMap contributors · CARTO'}),
+    el('div',{text:`데이터 수집 ${D.collected} · 실거래 ${FIRST} ~ ${LAST} · 매매 ${fmt(D.trades.length)}건 · 전월세 ${fmt(D.rents.length)}건 · 단지 ${fmt(APTS.length)}곳`}),
+    el('div',{text:'본 자료는 공개 데이터를 정리한 참고용 브리핑이며 투자 권유가 아닙니다. 공급평형은 전용면적으로 추정한 근사값입니다. 개발계획은 공개된 계획 요약으로 추진 일정·내용이 변경될 수 있습니다. 샘플 표시 매물은 실제 매물 여부를 상담으로 확인해 주세요.'}));
+}
+
+/* ---------- 렌더 ---------- */
+function render(){const p=period();$('#d1').value=p.a;$('#d2').value=p.b;
+  renderKPI(p);renderTop(p);renderMarket(p);renderDong(p)}
+loadRecs();renderNotes();renderHS();
+render();
+const def=APTS.find(a=>a.dong==='화곡동'&&a.name.replace(/\s/g,'')==='강서힐스테이트')||APTS.slice().sort((x,y)=>y.n-x.n)[0];
+S.sel=def.id;renderDetail();renderLoc();renderNear();renderRecs();renderTop(period());
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{render();renderDetail();renderNear()});
+})();
+</script>
+</body>
+</html>
