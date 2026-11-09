@@ -344,9 +344,15 @@ function renderSubs() {
   const rows = G.subs.filter(r => S.subsTab === 'all' || (S.subsTab === 'gs' ? r.gu === '강서구' : NEAR.includes(r.gu)));
   if (!rows.length) { box.replaceChildren(el('div', { class: 'pad' }, noData('해당 지역 모집공고가 없습니다'))); return }
   const d = s => s ? s.slice(2).replace(/-/g, '.') : '-';
-  box.replaceChildren(el('div', { class: 'tbl' }, el('table', {}, el('thead', {}, el('tr', {}, ...['단지 · 위치', '구', '모집공고', '청약 접수', '당첨 발표', '입주 예정', '세대'].map((h, i) => el('th', { class: i < 2 ? 'l' : '', text: h })))),
-    el('tbody', {}, ...rows.slice(0, 60).map(r => el('tr', {}, el('td', { class: 'l' }, r.url ? el('a', { href: r.url, target: '_blank', rel: 'noopener', text: r.name }) : r.name, el('span', { class: 'sub', text: r.addr })), el('td', { class: 'l', text: r.gu }),
-      el('td', { class: 'num', text: d(r.notice) }), el('td', { class: 'num', text: `${d(r.start)}~${d(r.end).slice(3)}` }), el('td', { class: 'num', text: d(r.win) }), el('td', { class: 'num', text: r.move ? r.move.slice(2, 4) + '.' + r.move.slice(4) : '-' }), el('td', { class: 'num', text: r.units ? fmt(r.units) : '-' })))))));
+  // 주택형: "084.5300A" → "84A", 평당가는 공급면적이 있을 때만
+  const tyName = t => { const m = (t || '').trim().match(/^0*(\d+)(?:\.\d+)?\s*([A-Z]*)/); return m ? m[1] + (m[2] || '') : (t || '').trim() };
+  const types = r => (r.types || []).filter(t => t.amt).map(t => el('div', { class: 'num', style: 'white-space:nowrap' }, el('b', { text: tyName(t.ty) + ' ' }), won(t.amt), el('span', { class: 'sub', style: 'display:inline;margin-left:4px', text: `(${t.ar ? '평당 ' + fmt(t.amt / t.ar * PYC) + '만 · ' : ''}${t.n}세대)` })));
+  box.replaceChildren(el('div', { class: 'tbl', style: 'max-height:560px' }, el('table', {}, el('thead', {}, el('tr', {}, ...['단지 · 위치', '구분', '모집공고', '청약 접수', '당첨 발표', '입주 예정', '세대', '주택형별 분양가 (최고가 · 공급면적 평당)'].map((h, i) => el('th', { class: i < 2 || i === 7 ? 'l' : '', text: h })))),
+    el('tbody', {}, ...rows.slice(0, 80).map(r => el('tr', {}, el('td', { class: 'l', style: 'white-space:normal;min-width:200px' }, r.url ? el('a', { href: r.url, target: '_blank', rel: 'noopener', text: r.name }) : r.name, el('span', { class: 'sub', text: `${r.gu} · ${r.addr}` })),
+      el('td', { class: 'l' }, r.kind || 'APT', r.type ? el('span', { class: 'sub', text: r.type }) : null),
+      el('td', { class: 'num', text: d(r.notice) }), el('td', { class: 'num', text: r.start ? `${d(r.start)}~${d(r.end).slice(3)}` : '-' }), el('td', { class: 'num', text: d(r.win) }),
+      el('td', { class: 'num', text: r.move ? r.move.slice(2, 4) + '.' + r.move.slice(4) : '-' }), el('td', { class: 'num', text: r.units ? fmt(r.units) : '-' }), el('td', { class: 'l' }, ...types(r))))))),
+    el('div', { class: 'src pad', text: `청약홈(한국부동산원) 모집공고 · 최근 3년 · ${rows.length}건${rows.length > 80 ? ' 중 최근 80건' : ''} · 무순위·잔여세대 공고는 공급면적이 없어 평당가를 표시하지 않습니다` }));
 }
 
 /* ================= 9. 단지 검색 ================= */

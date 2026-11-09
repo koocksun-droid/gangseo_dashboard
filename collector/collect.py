@@ -305,30 +305,57 @@ def collect_hug():
 
 
 # ---------------------------------------------------------------- 청약홈 분양정보 (한국부동산원)
-SUBS_AREA = ["강서구", "양천구", "마포구", "영등포구", "구로구"]  # 강서구 + 인접구
+ODCLOUD = "https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1"
+SUBS_KINDS = {  # 구분: (공고 상세, 주택형별)
+    "APT": ("getAPTLttotPblancDetail", "getAPTLttotPblancMdl"),
+    "무순위·잔여": ("getRemndrLttotPblancDetail", "getRemndrLttotPblancMdl"),
+}
 
 
-def collect_subscription():
+def odcloud(op, **cond):
     rows, page = [], 1
     while True:
-        q = urllib.parse.urlencode({"page": page, "perPage": 500, "serviceKey": ENV["DATA_GO_KR_KEY"], "cond[SUBSCRPT_AREA_CODE_NM::EQ]": "서울"})
-        d = json.loads(get(f"https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/getAPTLttotPblancDetail?{q}"))
+        q = {"page": page, "perPage": 1000, "serviceKey": ENV["DATA_GO_KR_KEY"]}
+        q.update({f"cond[{k}]": v for k, v in cond.items()})
+        d = json.loads(get(f"{ODCLOUD}/{op}?{urllib.parse.urlencode(q)}"))
         if "data" not in d:
             raise ApiError(d.get("msg") or str(d)[:200])
         rows += d["data"]
-        if page * 500 >= d.get("totalCount", 0):
-            break
+        if page * 1000 >= d.get("matchCount", d.get("totalCount", 0)):
+            return rows
         page += 1
+
+
+def collect_subscription():
+    """서울 아파트 모집공고(최근 3년)와 주택형별 분양가. 주택형은 공고마다 바뀌지 않아 캐시한다."""
+    since = f"{date.today().year - 3}-{date.today().month:02d}-01"
+    cache_f = DATA / "subs_cache.json"
+    cache = json.loads(cache_f.read_text(encoding="utf-8")) if cache_f.exists() else {}
     out = []
-    for r in rows:
-        addr = r.get("HSSPLY_ADRES", "")
-        gu = next((g for g in SUBS_AREA if g in addr), "서울")
-        out.append({"name": r.get("HOUSE_NM"), "addr": addr, "gu": gu, "units": r.get("TOT_SUPLY_HSHLDCO"),
-                    "notice": r.get("RCRIT_PBLANC_DE"), "start": r.get("RCEPT_BGNDE"), "end": r.get("RCEPT_ENDDE"),
-                    "win": r.get("PRZWNER_PRESNATN_DE"), "move": r.get("MVN_PREARNGE_YM"), "url": r.get("PBLANC_URL"),
-                    "id": r.get("PBLANC_NO"), "house": r.get("HOUSE_MANAGE_NO")})
+    for kind, (op_d, op_m) in SUBS_KINDS.items():
+        cond = {"RCRIT_PBLANC_DE::GTE": since}
+        if kind == "APT":
+            cond["SUBSCRPT_AREA_CODE_NM::EQ"] = "서울"
+        rows = [r for r in odcloud(op_d, **cond) if (r.get("HSSPLY_ADRES") or "").startswith(("서울", "서울특별시"))]
+        for r in rows:
+            addr = r.get("HSSPLY_ADRES", "")
+            m = re.search(r"서울(?:특별시)?\s*(\S+구)", addr)
+            key = f"{kind}|{r.get('HOUSE_MANAGE_NO')}|{r.get('PBLANC_NO')}"
+            if key not in cache:
+                types = odcloud(op_m, **{"HOUSE_MANAGE_NO::EQ": r.get("HOUSE_MANAGE_NO"), "PBLANC_NO::EQ": r.get("PBLANC_NO")})
+                cache[key] = [{"ty": t.get("HOUSE_TY"), "ar": float(t.get("SUPLY_AR") or 0), "amt": int(float(t.get("LTTOT_TOP_AMOUNT") or 0)),
+                               "n": int(t.get("SUPLY_HSHLDCO") or 0) + int(t.get("SPSPLY_HSHLDCO") or 0)} for t in types]
+                time.sleep(0.05)
+            out.append({"kind": kind, "type": r.get("HOUSE_DTL_SECD_NM") or "", "name": r.get("HOUSE_NM"), "addr": addr, "gu": m.group(1) if m else "서울",
+                        "units": r.get("TOT_SUPLY_HSHLDCO"), "builder": r.get("CNSTRCT_ENTRPS_NM") or "",
+                        "notice": r.get("RCRIT_PBLANC_DE"), "start": r.get("RCEPT_BGNDE") or r.get("SUBSCRPT_RCEPT_BGNDE"),
+                        "end": r.get("RCEPT_ENDDE") or r.get("SUBSCRPT_RCEPT_ENDDE"), "win": r.get("PRZWNER_PRESNATN_DE"),
+                        "move": r.get("MVN_PREARNGE_YM"), "url": r.get("PBLANC_URL"), "id": r.get("PBLANC_NO"),
+                        "house": r.get("HOUSE_MANAGE_NO"), "types": cache[key]})
+    cache_f.write_text(json.dumps(cache, ensure_ascii=False), encoding="utf-8")
     out.sort(key=lambda x: x["notice"] or "", reverse=True)
-    print(f"  청약 모집공고(서울): {len(out)}건")
+    from collections import Counter
+    print(f"  청약 모집공고(서울, {since}~): {len(out)}건 · 강서구 {sum(1 for x in out if x['gu'] == '강서구')} · {dict(Counter(x['kind'] for x in out))}")
     return out
 
 

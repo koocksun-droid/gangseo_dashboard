@@ -64,7 +64,7 @@ jobs:
         run: |
           mkdir _site
           cp -r index.html assets data data-demo _site/
-          rm -f _site/data/gogo_cache.json _site/data/geocode_cache.json
+          rm -f _site/data/gogo_cache.json _site/data/geocode_cache.json _site/data/subs_cache.json
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

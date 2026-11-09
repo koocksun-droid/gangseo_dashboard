@@ -11,7 +11,7 @@
 <link rel="icon" href="assets/logo.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<link rel="stylesheet" href="assets/app.css?v=20261109c">
+<link rel="stylesheet" href="assets/app.css?v=20261109d">
 </head>
 <body>
 <div class="demo-band hidden" id="demoBand">가상 데이터 · 화면 확인용 예시이며 실제 시세가 아닙니다</div>
@@ -45,11 +45,14 @@
   </div>
   <div class="cond" id="cond"></div>
 
-  <!-- 1. 추천매물 -->
-  <section id="s-listings" class="promo">
-    <div class="sh"><h2>추천매물</h2><small>GO부동산이 직접 확인한 매물 · 상담 환영</small><span class="sp"></span><a class="more noprint" id="moreLink" href="https://gogogogo.kr" target="_blank" rel="noopener">매물 더보기 →</a></div>
-    <div class="lst" id="listings"></div>
-    <div class="src" id="listNote" style="margin-top:6px"></div>
+  <!-- 9. 단지 검색 -->
+  <section id="s-search" class="noprint">
+    <div class="sh"><h2 id="searchTitle">아파트 단지 검색</h2><small>누르면 아래에 지도와 입지분석이 열립니다</small></div>
+    <div class="card">
+      <div class="toolbar"><input type="search" id="q" placeholder="단지명 · 동 검색" aria-label="단지 검색"><select id="qSort" aria-label="정렬"><option value="recent">최근 거래순</option><option value="name">이름순</option><option value="price">매매가 높은순</option><option value="cnt">거래 많은순</option><option value="new">신축순</option></select></div>
+      <div class="toolbar chips" id="qDong" role="group" aria-label="동 선택" style="padding-top:8px"></div>
+      <div class="tbl" style="max-height:420px"><table id="tSearch"></table></div>
+    </div>
   </section>
 
   <!-- 핵심 지표 -->
@@ -102,16 +105,6 @@
     <div class="card" id="subsBox"></div>
   </section>
 
-  <!-- 9. 단지 검색 -->
-  <section id="s-search" class="noprint">
-    <div class="sh"><h2 id="searchTitle">아파트 단지 검색</h2><small>누르면 아래에 지도와 입지분석이 열립니다</small></div>
-    <div class="card">
-      <div class="toolbar"><input type="search" id="q" placeholder="단지명 · 동 검색" aria-label="단지 검색"><select id="qSort" aria-label="정렬"><option value="recent">최근 거래순</option><option value="name">이름순</option><option value="price">매매가 높은순</option><option value="cnt">거래 많은순</option><option value="new">신축순</option></select></div>
-      <div class="toolbar chips" id="qDong" role="group" aria-label="동 선택" style="padding-top:8px"></div>
-      <div class="tbl" style="max-height:420px"><table id="tSearch"></table></div>
-    </div>
-  </section>
-
   <!-- 10. 위치 안내 -->
   <section id="s-office" class="promo">
     <div class="sh"><h2>위치 안내</h2><small>방문 상담 환영 · 주차 가능 여부는 전화로 문의</small></div>
@@ -124,6 +117,13 @@
       <span class="seg noprint" id="topKind"><button type="button" data-v="t">매매</button><button type="button" data-v="j">전세</button><button type="button" data-v="w">월세</button></span>
       <span class="seg noprint" id="topSort"><button type="button" data-v="max">최고가순</button><button type="button" data-v="cnt">거래량순</button></span></div>
     <div class="grid2 wl"><div class="card"><div class="tbl" style="max-height:440px"><table id="tTop"></table></div></div><div class="card"><div class="map" id="topMap" role="region" aria-label="TOP 10 위치 지도"></div></div></div>
+  </section>
+
+  <!-- 1. 추천매물 -->
+  <section id="s-listings" class="promo">
+    <div class="sh"><h2>추천매물</h2><small>GO부동산이 직접 확인한 매물 · 상담 환영</small><span class="sp"></span><a class="more noprint" id="moreLink" href="https://gogogogo.kr" target="_blank" rel="noopener">매물 더보기 →</a></div>
+    <div class="lst" id="listings"></div>
+    <div class="src" id="listNote" style="margin-top:6px"></div>
   </section>
 
   <!-- 12. 단지 상세 -->
@@ -149,6 +149,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="assets/app.js?v=20261109c"></script>
+<script src="assets/app.js?v=20261109d"></script>
 </body>
 </html>
