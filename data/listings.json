@@ -1,0 +1,19 @@
+{
+  "_안내": "gogogogo.kr 에서 매물을 못 가져올 때 쓰는 직접 입력 양식입니다. items 에 매물을 추가하세요. 사진은 assets/listings/ 에 넣고 파일명을 적습니다.",
+  "items": [],
+  "_예시": {
+    "title": "강서힐스테이트 33평 남향",
+    "type": "매매|전세|월세",
+    "cat": "아파트|빌라|주택",
+    "dong": "화곡동",
+    "complex": "강서힐스테이트",
+    "area": 84.99,
+    "supplyPy": 33,
+    "floor": "12층/21층",
+    "price": 157000,
+    "deposit": 0,
+    "photo": "assets/listings/10947.jpg",
+    "point": "남향 · 확장 · 집구경 가능",
+    "url": "https://gogogogo.kr/item/view/10947"
+  }
+}

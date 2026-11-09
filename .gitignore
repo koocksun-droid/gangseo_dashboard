@@ -1,6 +1,8 @@
+.env
 collector/config.json
 data/raw/
 .claude/
 gangseo_dashboard_navermap.html
 GO부동산 강서구 아파트 브리핑.html
 __pycache__/
+_stage1_report.html

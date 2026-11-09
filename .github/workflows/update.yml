@@ -1,0 +1,73 @@
+name: 데이터 갱신 · 배포
+
+on:
+  schedule:
+    - cron: "0 21 * * 0"   # 매주 월요일 06:00 (한국시간)
+  workflow_dispatch:         # Actions 탭의 "Run workflow" 수동 실행 버튼
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    # 정기·수동 실행 때만 수집한다. push 때는 바로 배포만.
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 지난 실거래 원본 캐시
+        uses: actions/cache@v4
+        with:
+          path: data/raw
+          key: raw-${{ github.run_id }}
+          restore-keys: raw-
+      - name: 수집
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          RONE_KEY: ${{ secrets.RONE_KEY }}
+          KAKAO_KEY: ${{ secrets.KAKAO_KEY }}
+        # 소스별 실패는 collect.py 가 기존 파일을 지키고 data/meta.json 에 기록한다.
+        # 스크립트 전체가 실패하면 아래 커밋 단계가 실행되지 않아 이전 데이터가 그대로 남는다.
+        run: python collector/collect.py
+      - name: 바뀐 데이터 커밋
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then echo "변경 없음"; exit 0; fi
+          git commit -m "데이터 자동 갱신 $(TZ=Asia/Seoul date +'%Y-%m-%d %H:%M')"
+          git push
+
+  deploy:
+    needs: [collect]
+    if: always() && (needs.collect.result == 'success' || needs.collect.result == 'skipped')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main   # 방금 커밋한 데이터까지 포함
+      - name: 배포 파일 정리
+        run: |
+          mkdir _site
+          cp -r index.html assets data data-demo _site/
+          rm -f _site/data/gogo_cache.json _site/data/geocode_cache.json
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
