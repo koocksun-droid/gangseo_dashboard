@@ -42,6 +42,12 @@ select,input{font:inherit;font-size:14px;color:var(--ink);background:#fff;border
 .bar .sp{flex:1}
 .pbtn{border:0;border-radius:10px;padding:8px 13px;font-weight:700;font-size:13px;background:var(--ink);color:#fff}
 .pbtn.red{background:var(--red)}
+.pbtn.share{background:#fff;color:var(--ink);border:1px solid var(--ink)}
+.qrbox{display:flex;gap:12px;align-items:center;margin-top:6px;padding:10px;border:1px dashed var(--line);border-radius:12px}
+.qrbox img{width:92px;height:92px;flex:none}
+.qrbox .src{line-height:1.5}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-weight:700;z-index:2000;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.pqr{display:none}
 .cond{font-size:12px;color:var(--muted);margin-top:8px}
 /* layout */
 section{margin-top:26px;scroll-margin-top:150px}
@@ -166,6 +172,9 @@ td .sub{display:block;color:var(--muted);font-size:11px}
   .ph-print img{height:44px}
   .ph-print .c{margin-left:auto;text-align:right}
   .ph-print .tel{font-size:18px;font-weight:900;color:var(--red)}
+  .ph-print .pqr{display:block;width:64px;height:64px;margin-left:10px}
+  body.print-promo .ph-print .pqr{width:90px;height:90px}
+  .qrbox .noprint{display:none}
   .card,.lc,.kpi,table,tr,.lcard,section>.sh{break-inside:avoid}
   section{margin-top:12px}
   .card,.lc{box-shadow:none}

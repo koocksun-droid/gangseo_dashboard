@@ -149,6 +149,7 @@ function initFilters() {
   $('#qSort').onchange = renderSearch;
   $('#printBrief').onclick = () => doPrint('print-brief');
   $('#printPromo').onclick = () => doPrint('print-promo');
+  $('#shareBtn').onclick = sharePage;
 }
 function fillDongs() {
   const cnt = {}; T().b.forEach(b => cnt[b.dong] = (cnt[b.dong] || 0) + b.t.length + b.r.length);
@@ -389,7 +390,8 @@ function renderOffice() {
   const kmap = o ? `https://map.kakao.com/link/to/${encodeURIComponent(s.short)},${o.lat},${o.lon}` : `https://map.kakao.com/?q=${encodeURIComponent(s.addr)}`;
   $('#officeInfo').replaceChildren(el('img', { src: 'assets/logo.png', alt: 'GO부동산 로고' }), el('div', { style: 'font-size:20px;font-weight:900', text: s.office }), el('div', { class: 'src', text: s.ceo }),
     el('div', { text: s.addr }), el('a', { class: 'tel num', href: 'tel:' + tel, text: '☎ ' + s.tel }),
-    el('div', { class: 'btns noprint' }, el('a', { class: 'more', href: kmap, target: '_blank', rel: 'noopener', text: '카카오맵 길찾기' }), el('a', { class: 'more', style: 'background:var(--red)', href: s.homepage, target: '_blank', rel: 'noopener', text: '홈페이지' })));
+    el('div', { class: 'btns noprint' }, el('a', { class: 'more', href: kmap, target: '_blank', rel: 'noopener', text: '카카오맵 길찾기' }), el('a', { class: 'more', style: 'background:var(--red)', href: s.homepage, target: '_blank', rel: 'noopener', text: '홈페이지' })),
+    el('div', { class: 'qrbox' }, el('img', { src: 'assets/qr.png', alt: '이 브리핑 페이지 QR 코드' }), el('div', { class: 'src' }, el('b', { style: 'color:var(--ink)', text: '이 브리핑 페이지 바로가기' }), el('br'), '휴대폰 카메라로 찍으면 열립니다', el('br'), el('button', { type: 'button', class: 'chip noprint', style: 'margin-top:6px', onclick: copyLink }, '🔗 링크 복사'))));
   if (!o) { $('#officeMap').replaceChildren(noData('사무소 좌표 없음')); return }
   if (!officeMap) {
     officeMap = baseMap('officeMap', [o.lat, o.lon], 16);
@@ -540,6 +542,24 @@ function renderLayerBtns() {
   $('#layers').replaceChildren(...LAY.map(l => el('button', { type: 'button', 'aria-pressed': String(lay[l[0]] !== false), onclick: () => { lay[l[0]] = lay[l[0]] === false; store.set('go-gs3-layers', lay); renderLayerBtns(); applyLayers() } }, el('i', { style: `background:${l[2]}` }), l[1])));
 }
 function applyLayers() { for (const k in locGroups) { if (k === '_base' || lay[k] !== false) locGroups[k].addTo(locMap); else locGroups[k].remove() } }
+
+/* ================= 공유 ================= */
+const PAGE_URL = 'https://koocksun-droid.github.io/gangseo_dashboard/';
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => { t.hidden = true }, 2200) }
+async function copyLink() {
+  const done = () => toast('링크를 복사했습니다. 카톡·문자에 붙여넣기 하세요');
+  try { await navigator.clipboard.writeText(PAGE_URL); return done() } catch (e) { }
+  // 클립보드 권한이 없는 브라우저(앱 내 브라우저 등)용 예전 방식
+  const ta = el('textarea', { readonly: true, style: 'position:fixed;top:-100px;opacity:0' }); ta.value = PAGE_URL; document.body.append(ta); ta.select();
+  let ok = false; try { ok = document.execCommand('copy') } catch (e) { }
+  ta.remove();
+  if (ok) done(); else window.prompt('아래 주소를 복사하세요', PAGE_URL);
+}
+async function sharePage() {
+  // 휴대폰에서는 카카오톡·문자 등 공유 창이 열리고, PC에서는 주소를 복사한다
+  if (navigator.share) { try { await navigator.share({ title: '강서구 주거용 시장 브리핑 · GO부동산', text: '강서구 아파트·빌라·주택 실거래가와 추천매물을 한눈에 · ☎ ' + G.site.tel, url: PAGE_URL }); return } catch (e) { if (e.name === 'AbortError') return } }
+  copyLink();
+}
 
 /* ================= 인쇄 ================= */
 function doPrint(cls) {

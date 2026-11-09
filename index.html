@@ -7,11 +7,19 @@
 <meta name="description" content="국토교통부 실거래가·한국부동산원 통계로 보는 서울 강서구 아파트·빌라·주택 시장 브리핑. GO부동산 공인중개사사무소">
 <meta property="og:title" content="강서구 주거용 시장 브리핑 · GO부동산">
 <meta property="og:description" content="강서구 아파트·빌라·주택 실거래가, 가격지수, 추천매물, 입지분석">
-<meta property="og:image" content="assets/logo.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="GO부동산">
+<meta property="og:url" content="https://koocksun-droid.github.io/gangseo_dashboard/">
+<meta property="og:image" content="https://koocksun-droid.github.io/gangseo_dashboard/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="GO부동산 강서구 주거용 시장 브리핑 · 대표 고옥선 · 010-2733-5040">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://koocksun-droid.github.io/gangseo_dashboard/">
 <link rel="icon" href="assets/logo.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<link rel="stylesheet" href="assets/app.css?v=20261109f">
+<link rel="stylesheet" href="assets/app.css?v=20261109h">
 </head>
 <body>
 <div class="demo-band hidden" id="demoBand">가상 데이터 · 화면 확인용 예시이며 실제 시세가 아닙니다</div>
@@ -25,7 +33,7 @@
 </div></header>
 
 <main class="wrap" id="top">
-  <div class="ph-print" aria-hidden="true"><img src="assets/logo.png" alt=""><div><b style="font-size:16px" id="pOffice"></b><div id="pAddr"></div></div><div class="c"><div class="tel" id="pTel"></div><div id="pCond"></div></div></div>
+  <div class="ph-print" aria-hidden="true"><img src="assets/logo.png" alt=""><div><b style="font-size:16px" id="pOffice"></b><div id="pAddr"></div></div><div class="c"><div class="tel" id="pTel"></div><div id="pCond"></div></div><img class="pqr" src="assets/qr.png" alt="브리핑 페이지 QR 코드"></div>
 
   <div class="title">
     <div class="eb">GANGSEO-GU HOUSING MARKET BRIEFING</div>
@@ -41,7 +49,7 @@
     <div class="fg"><span class="lb">집계</span><span class="seg" id="fUnit"><button type="button" data-v="week">주간</button><button type="button" data-v="month">월간</button></span></div>
     <div class="fg"><span class="lb">면적</span><select id="fArea" aria-label="전용면적"><option value="all">전체</option><option value="s">60㎡ 이하</option><option value="m">60~85㎡</option><option value="l">85㎡ 초과</option></select></div>
     <span class="sp"></span>
-    <div class="fg"><button class="pbtn" type="button" id="printBrief">🖨 브리핑용 인쇄</button><button class="pbtn red" type="button" id="printPromo">🖨 홍보용 인쇄</button></div>
+    <div class="fg"><button class="pbtn share" type="button" id="shareBtn">🔗 공유하기</button><button class="pbtn" type="button" id="printBrief">🖨 브리핑용 인쇄</button><button class="pbtn red" type="button" id="printPromo">🖨 홍보용 인쇄</button></div>
   </div>
   <div class="cond" id="cond"></div>
 
@@ -145,10 +153,11 @@
 
 </main>
 
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 <footer class="ft"><div class="wrap" id="foot"></div></footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="assets/app.js?v=20261109f"></script>
+<script src="assets/app.js?v=20261109h"></script>
 </body>
 </html>
