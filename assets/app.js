@@ -121,7 +121,7 @@ function renderChrome() {
   $('#asof').textContent = `국토교통부 실거래가 · 한국부동산원 R-ONE 기준 · 데이터 수집 ${m.collected || '-'}` + (DEMO ? ' · 가상 데이터' : '');
   const src = '국토교통부 실거래가(공공데이터포털), 한국부동산원 R-ONE·청약홈, 주택도시보증공사(HUG) 분양가격, 카카오 로컬, GO부동산(gogogogo.kr) 매물, 지도 © OpenStreetMap contributors';
   $('#foot').replaceChildren(
-    el('div', { class: 'top' }, el('img', { src: 'assets/logo.png', alt: 'GO부동산 로고' }), el('div', {}, el('div', { class: 'slogan', text: s.slogan }), el('div', {}, el('b', { text: s.office }), ` · ${s.ceo} · ☎ `, el('a', { href: 'tel:' + s.tel.replace(/-/g, ''), text: s.tel })))),
+    el('div', { class: 'top' }, el('img', { src: 'assets/logo.png', alt: 'GO부동산 로고' }), el('div', {}, el('div', { class: 'slogan', text: s.slogan }), el('div', {}, el('b', { text: s.office }), ` · ${s.ceo}${s.regNo ? ' · 등록번호 ' + s.regNo : ''} · ☎ `, el('a', { href: 'tel:' + s.tel.replace(/-/g, ''), text: s.tel })))),
     el('div', {}, s.addr, ' · ', el('a', { href: s.homepage, target: '_blank', rel: 'noopener', text: s.homepage.replace(/^https?:\/\//, '') }), s.email ? ' · ' + s.email : '', ...snsLinks().flatMap(a => [' · ', a])),
     el('div', { text: '데이터 출처: ' + src }),
     el('div', { class: 'disc', text: '본 자료는 고객 상담용 참고자료이며 투자 판단의 책임은 본인에게 있습니다. 실거래가는 계약일 기준이며 신고기한(30일)으로 최근 자료는 늘어날 수 있습니다. 개발계획은 공개 자료를 정리한 것으로 일정·내용이 바뀔 수 있습니다.' }));
