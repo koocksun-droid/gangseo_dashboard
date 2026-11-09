@@ -114,7 +114,8 @@ function snsLinks() {
 function renderChrome() {
   const s = G.site;
   $('#hOffice').textContent = s.short; $('#hTel').textContent = s.tel; $('#hCall').href = 'tel:' + s.tel.replace(/-/g, '');
-  $('#sns').replaceChildren(...snsLinks());
+  $('#hHome').href = s.homepage;
+  $('#sns').replaceChildren(...snsLinks().slice(s.homepage ? 1 : 0));  // 홈페이지는 상단 큰 버튼으로 따로 둔다
   $('#pOffice').textContent = s.office; $('#pAddr').textContent = s.addr; $('#pTel').textContent = '☎ ' + s.tel;
   $('#moreLink').href = s.listingsMore || s.homepage;
   const m = G.meta || {};
