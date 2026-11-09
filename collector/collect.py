@@ -23,7 +23,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -47,6 +47,7 @@ def load_env():
 
 
 ENV = load_env()
+KST = timezone(timedelta(hours=9))  # GitHub 서버(UTC)에서 돌아도 한국시간으로 기록
 LAWD = "11500"  # 서울 강서구
 MONTHS_BACK = 36
 BBOX = (37.522, 126.762, 37.602, 126.882)  # 강서구 범위 (남, 서, 북, 동)
@@ -527,7 +528,7 @@ def run(status, name, fn):
     t0 = time.time()
     try:
         res = fn()
-        status[name] = {"ok": True, "at": datetime.now().strftime("%Y-%m-%d %H:%M"), "sec": round(time.time() - t0)}
+        status[name] = {"ok": True, "at": datetime.now(KST).strftime("%Y-%m-%d %H:%M"), "sec": round(time.time() - t0)}
         return res
     except Exception as e:
         msg = str(e) if isinstance(e, ApiError) else f"{type(e).__name__}: {e}"
@@ -535,7 +536,7 @@ def run(status, name, fn):
         if not isinstance(e, ApiError):
             traceback.print_exc(limit=1)
         old = status.get(name, {})
-        status[name] = {"ok": False, "error": msg, "at": datetime.now().strftime("%Y-%m-%d %H:%M"), "last_ok": old.get("at") if old.get("ok") else old.get("last_ok")}
+        status[name] = {"ok": False, "error": msg, "at": datetime.now(KST).strftime("%Y-%m-%d %H:%M"), "last_ok": old.get("at") if old.get("ok") else old.get("last_ok")}
         return None
 
 
@@ -605,7 +606,7 @@ def main():
         if not (DATA / name).exists():
             (DATA / name).write_text(json.dumps(tpl, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    meta.update({"collected": datetime.now().strftime("%Y-%m-%d %H:%M"), "months": [min(months()), max(months())], "status": status})
+    meta.update({"collected": datetime.now(KST).strftime("%Y-%m-%d %H:%M"), "months": [min(months()), max(months())], "status": status})
     meta_f.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
     print("\n[결과]")
     for k, v in status.items():
